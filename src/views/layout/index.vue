@@ -5,20 +5,15 @@
         </el-aside>
         <el-container>
             <el-header class="header">
-                <div>
-                    <el-row class="box-card-header">
-                        <div style="padding-top: 15px">
-                            <!-- 面包屑导航，Breadcrumb -->
-                            <el-breadcrumb separator-class="el-icon-arrow-right">
-                                <el-breadcrumb-item v-for="item in breadcrumb" :key="item.id">{{ item }}</el-breadcrumb-item>
-                            </el-breadcrumb>
-                        </div>
-                    </el-row>
-                </div>
+                <el-row>
+                    <el-link class="header-text line-spacing" href="/console">控制台</el-link>
+                </el-row>
+
                 <el-row>
                     <div>
                         <el-text class="header-text line-spacing">{{ dateMessage }}</el-text>
                         <el-button link>欢迎您，{{ userInfo.username }}</el-button>
+                        <el-button class="header-text line-spacing" link @click="onUserCenter">个人中心</el-button>
                         <el-button link @click="Logout">退出</el-button>
                     </div>
                 </el-row>
@@ -33,7 +28,7 @@
 
 <script>
 import AppAside from "./aside";
-import { toLoginPage } from "@/utils/common.js";
+import { toLoginPage, toUserCenter } from "@/utils/common.js";
 import { basicInfo, logout } from "../../api";
 export default {
     name: "LayoutIndex",
@@ -66,6 +61,9 @@ export default {
                     this.LoadLogOut();
                 })
                 .catch(() => {});
+        },
+        onUserCenter() {
+            toUserCenter();
         },
         CurrentTime() {
             // 返回一个对象，包含日期、时间和星期几
@@ -122,7 +120,6 @@ export default {
 }
 .main {
     background-color: #e9eef3;
-    padding-left: 20px;
-    padding-top: 20px;
+    padding: 10px;
 }
 </style>

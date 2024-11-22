@@ -6,7 +6,7 @@ const routes = [
     {
         path: '/',
         component: Layout,
-        meta: { title: 'ats' },
+        meta: { title: 'ATS' },
         children: [
             { meta: { title: 'ATS' }, path: '', name: 'home', component: Home },
         ]
