@@ -163,8 +163,16 @@ export default {
             this.page = 1;
             this.loadGetAutLog(s, 1);
         },
+        // 设置查询的起始时间
+        setFromTime() {
+            let dateCopy = new Date(new Date());
+            dateCopy.setMonth(dateCopy.getMonth() - 2);
+            let timestamp = dateCopy.getTime();
+            this.eventQuery.etime = [timestamp];
+        },
     },
     created() {
+        this.setFromTime();
         this.GetbasicInfo();
         this.onRefresh();
     },
