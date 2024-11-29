@@ -20,3 +20,5 @@ export const logout = () => ajax('/api/uias/v1/user/logout', 'POST')
 export const basicInfo = () => ajax('/api/uias/v1/uias/user/basicInfo', 'GET', null, null)
 
 export const GetAutLog = (params) => ajax('/api/ats/v1/ats/traces', 'GET', params, null)
+
+export const GetExtras = (paths) => ajax(`/api/ats/v1/ats/extras/${paths.exid}`, 'GET', null, null)
