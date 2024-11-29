@@ -9,7 +9,9 @@
                             <span style="padding-left: 5px; padding-right: 5px"></span>
                         </el-row>
                         <el-row>
+                            <el-text>查询条件:</el-text>
                             <el-date-picker
+                                style="margin-left: 10px"
                                 size="small"
                                 v-model="eventQuery.etime"
                                 value-format="x"
@@ -20,22 +22,44 @@
                                 end-placeholder="结束时间"
                                 @change="onRefresh"
                             />
-                            <el-button size="small" type="primary" @click="onRefresh" :loading="loading" style="margin-left: 10px">刷新</el-button>
+                            <el-input
+                                size="small"
+                                v-model="eventQuery.name"
+                                style="width: 180px; margin-left: 10px"
+                                clearable
+                                placeholder="事件名称"
+                            />
+                            <el-input
+                                size="small"
+                                v-model="eventQuery.resourceId"
+                                style="width: 260px; margin-left: 10px"
+                                clearable
+                                placeholder="资源ID"
+                            />
+                            <el-button size="small" type="primary" @click="onRefresh" :loading="loading.autlog" style="margin-left: 10px">
+                                刷新
+                            </el-button>
                         </el-row>
                     </div>
                 </div>
             </template>
             <div>
-                <el-table :data="elogs" v-loading="loading">
-                    <el-table-column width="130" prop="name" label="事件名称" show-overflow-tooltip />
-                    <el-table-column width="130" prop="service" label="服务" show-overflow-tooltip />
-                    <el-table-column width="150" prop="account" label="操作账号" show-overflow-tooltip />
+                <el-table :data="elogs" v-loading="loading.autlog">
+                    <el-table-column prop="name" label="事件名称" show-overflow-tooltip />
+                    <el-table-column prop="service" label="服务" show-overflow-tooltip />
+                    <el-table-column prop="account" label="操作账号" show-overflow-tooltip />
                     <el-table-column prop="resource_id" label="资源ID" show-overflow-tooltip />
-                    <el-table-column width="130" prop="rating" label="事件级别" show-overflow-tooltip />
+                    <el-table-column prop="rating" label="事件级别" show-overflow-tooltip />
                     <el-table-column prop="message" label="事件内容" show-overflow-tooltip />
-                    <el-table-column width="130" prop="source_ip" label="源地址" show-overflow-tooltip />
                     <el-table-column label="操作时间" show-overflow-tooltip>
                         <template #default="scope">{{ formatDate(scope.row.etime) }}</template>
+                    </el-table-column>
+                    <el-table-column label="操作">
+                        <template #default="scope">
+                            <span v-if="scope.row.extras">
+                                <el-button link type="primary" @click="onExtras(scope.row)">查看更多</el-button>
+                            </span>
+                        </template>
                     </el-table-column>
                 </el-table>
             </div>
@@ -47,12 +71,20 @@
                 </div>
             </div>
         </el-card>
+        <!-- 详情开始 -->
+        <el-dialog v-model="openExtras" title="日志详情" width="960px" :close-on-click-modal="false" draggable>
+            <div style="margin-left: 28px; margin-right: 28px" v-loading="loading.extras">
+                <pre>{{ moreData }}</pre>
+            </div>
+        </el-dialog>
+        <!-- 详情结束 -->
     </div>
 </template>
 <script>
 import Pagination from "@/components/pagination/pagination";
+import { deepClone } from "@/utils/deepClone.js";
 import { formatTime } from "@/utils/date.js";
-import { basicInfo, GetAutLog } from "../../api";
+import { basicInfo, GetAutLog, GetExtras } from "../../api";
 export default {
     name: "HomeIndex",
     components: {
@@ -67,8 +99,9 @@ export default {
             pageTotal: 0,
             pageSize: 10,
             page: 1,
-            loading: true,
             eventQuery: {
+                name: null,
+                resourceId: null,
                 etime: null, // []
                 shortcuts: [
                     {
@@ -116,6 +149,12 @@ export default {
                     },
                 ],
             },
+            openExtras: false,
+            loading: {
+                autlog: true,
+                extras: true,
+            },
+            moreData: {},
         };
     },
     methods: {
@@ -135,20 +174,32 @@ export default {
                 .then((res) => {
                     this.elogs = res.payload.items;
                     this.pageTotal = res.payload.page_info.total;
-                    this.loading = false;
+                    this.loading.autlog = false;
                 })
                 .catch((err) => {
-                    this.loading = false;
+                    this.loading.autlog = false;
                     if (err.status !== 403) {
                         this.$message.error({ message: err.data, plain: true, showClose: true, duration: 2000 });
                     }
                 });
         },
+        onExtras(val) {
+            this.loading.extras = true;
+            this.openExtras = true;
+            this.moreData = deepClone(val);
+            const paths = { exid: val.extras };
+            GetExtras(paths)
+                .then((res) => {
+                    this.loading.extras = false;
+                    this.moreData.extras = res.payload.extras;
+                })
+                .catch();
+        },
         formatDate(time) {
             return formatTime(time);
         },
         onRefresh() {
-            this.loading = true;
+            this.loading.autlog = true;
             clearTimeout(this.timeoutId);
             this.timeoutId = setTimeout(() => {
                 this.loadGetAutLog(this.pageSize, this.page);
@@ -179,4 +230,14 @@ export default {
 };
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+pre {
+    background-color: #f4f4f4;
+    font-family: monospace;
+    padding: 10px;
+    white-space: pre-wrap;
+    tab-size: 4;
+    border-radius: 5px; /* 设置边框圆角 */
+    overflow-x: auto; /* 设置水平滚动条（如果需要） */
+}
+</style>
