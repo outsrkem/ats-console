@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 const Layout = () => import('../views/layout/index.vue')
 const Home = () => import('../views/home/index.vue')
+const Setting = () => import('../views/setting/index.vue')
 
 const routes = [
     {
@@ -8,7 +9,8 @@ const routes = [
         component: Layout,
         meta: { title: 'ATS' },
         children: [
-            { meta: { title: 'ATS' }, path: '', name: 'home', component: Home },
+            { meta: { title: 'ATS' }, path: '/', name: 'home', component: Home },
+            { meta: { title: 'ATS' }, path: '/setting', name: 'setting', component: Setting },
         ]
       }
 ]

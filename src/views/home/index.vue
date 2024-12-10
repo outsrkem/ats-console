@@ -1,44 +1,31 @@
 <template>
-    <div class="settings-container">
+    <div>
         <el-card class="box-card">
             <template #header>
                 <div class="card-header">
                     <div class="my_refresh">
                         <el-row>
-                            <span>审计日志</span>
+                            <span>事件列表</span>
                             <span style="padding-left: 5px; padding-right: 5px"></span>
                         </el-row>
                         <el-row>
-                            <el-text>查询条件:</el-text>
-                            <el-date-picker
-                                style="margin-left: 10px"
-                                size="small"
-                                v-model="eventQuery.etime"
-                                value-format="x"
-                                type="datetimerange"
-                                :shortcuts="eventQuery.shortcuts"
-                                range-separator="-"
-                                start-placeholder="开始时间"
-                                end-placeholder="结束时间"
-                                @change="onRefresh"
-                            />
-                            <el-input
-                                size="small"
-                                v-model="eventQuery.name"
-                                style="width: 180px; margin-left: 10px"
-                                clearable
-                                placeholder="事件名称"
-                            />
-                            <el-input
-                                size="small"
-                                v-model="eventQuery.resourceId"
-                                style="width: 260px; margin-left: 10px"
-                                clearable
-                                placeholder="资源ID"
-                            />
-                            <el-button size="small" type="primary" @click="onRefresh" :loading="loading.autlog" style="margin-left: 10px">
-                                刷新
-                            </el-button>
+                            <el-space :size="10" spacer="">
+                                <el-text>查询条件:</el-text>
+                                <el-date-picker
+                                    size="small"
+                                    v-model="eventQuery.etime"
+                                    value-format="x"
+                                    type="datetimerange"
+                                    :shortcuts="eventQuery.shortcuts"
+                                    range-separator="-"
+                                    start-placeholder="开始时间"
+                                    end-placeholder="结束时间"
+                                    @change="onRefresh"
+                                />
+                                <el-input size="small" v-model="eventQuery.name" style="width: 180px" clearable placeholder="事件名称" />
+                                <el-input size="small" v-model="eventQuery.resourceId" style="width: 260px" clearable placeholder="资源ID" />
+                                <el-button size="small" type="primary" @click="onRefresh" :loading="loading.autlog"> 刷新 </el-button>
+                            </el-space>
                         </el-row>
                     </div>
                 </div>
@@ -50,7 +37,7 @@
                     <el-table-column prop="account" label="操作账号" show-overflow-tooltip />
                     <el-table-column prop="resource_id" label="资源ID" show-overflow-tooltip />
                     <el-table-column prop="rating" label="事件级别" show-overflow-tooltip />
-                    <el-table-column prop="message" label="事件内容" show-overflow-tooltip />
+                    <el-table-column prop="message" label="事件消息" show-overflow-tooltip />
                     <el-table-column label="操作时间" show-overflow-tooltip>
                         <template #default="scope">{{ formatDate(scope.row.etime) }}</template>
                     </el-table-column>
@@ -223,6 +210,7 @@ export default {
         },
     },
     created() {
+        this.$globalBus.emit("updateActivePath", "/");
         this.setFromTime();
         this.GetbasicInfo();
         this.onRefresh();
