@@ -17,6 +17,7 @@
                                     value-format="x"
                                     type="datetimerange"
                                     :shortcuts="eventQuery.shortcuts"
+                                    :disabled-date="disabledDate"
                                     range-separator="-"
                                     start-placeholder="开始时间"
                                     end-placeholder="结束时间"
@@ -135,6 +136,10 @@ export default {
                         },
                     },
                 ],
+            },
+            // 设置禁用掉的日期
+            disabledDate: (time) => {
+                return time.getTime() > Date.now();
             },
             openExtras: false,
             loading: {
