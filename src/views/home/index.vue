@@ -33,11 +33,16 @@
             </template>
             <div>
                 <el-table :data="elogs" v-loading="loading.autlog">
-                    <el-table-column prop="name" label="事件名称" show-overflow-tooltip />
-                    <el-table-column prop="service" label="服务" show-overflow-tooltip />
+                    <el-table-column prop="name" label="事件名称" width="170" show-overflow-tooltip />
+                    <el-table-column prop="service" label="服务" width="100" show-overflow-tooltip />
                     <el-table-column prop="account" label="操作账号" show-overflow-tooltip />
-                    <el-table-column prop="resource_id" label="资源ID" show-overflow-tooltip />
-                    <el-table-column prop="rating" label="事件级别" show-overflow-tooltip />
+                    <el-table-column prop="resource_id" label="资源ID" width="320" show-overflow-tooltip />
+                    <el-table-column prop="rating" label="事件级别" width="100" show-overflow-tooltip>
+                        <template #default="scope">
+                            <span class="rating-dot" :class="scope.row.rating" />
+                            <span>{{ scope.row.rating }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="message" label="事件消息" show-overflow-tooltip />
                     <el-table-column label="操作时间" show-overflow-tooltip>
                         <template #default="scope">{{ formatDate(scope.row.etime) }}</template>
@@ -60,9 +65,11 @@
             </div>
         </el-card>
         <!-- 详情开始 -->
-        <el-dialog v-model="openExtras" title="日志详情" width="960px" :close-on-click-modal="false" draggable>
+        <el-dialog v-model="openExtras" title="日志详情" width="1200px" :close-on-click-modal="false" draggable>
             <div style="margin-left: 28px; margin-right: 28px" v-loading="loading.extras">
-                <pre>{{ moreData }}</pre>
+                <div class="code-container">
+                    <pre class="codepre">{{ moreData }}</pre>
+                </div>
             </div>
         </el-dialog>
         <!-- 详情结束 -->
@@ -85,7 +92,7 @@ export default {
             timeoutId: null,
             elogs: [],
             pageTotal: 0,
-            pageSize: 10,
+            pageSize: 15,
             page: 1,
             eventQuery: {
                 name: null,
@@ -224,13 +231,53 @@ export default {
 </script>
 
 <style scoped lang="less">
-pre {
-    background-color: #f4f4f4;
-    font-family: monospace;
+.code-container {
+    position: relative;
+    max-height: 600px;
+    overflow: auto;
+    margin-top: 10px;
+    border: 1px solid #ebeef5;
+    border-radius: 4px;
     padding: 10px;
-    white-space: pre-wrap;
-    tab-size: 4;
-    border-radius: 5px; /* 设置边框圆角 */
-    overflow-x: auto; /* 设置水平滚动条（如果需要） */
+    background-color: #f5f5f5;
+}
+.codepre {
+    box-sizing: border-box;
+    /*以下样式是自动换行代码*/
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space: -pre-wrap; /* Opera 4-6 */
+    white-space: -o-pre-wrap; /* Opera 7 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
+    /*以上样式是自动换行代码，需要的加上，不需要的删除*/
+    overflow: auto;
+    font-family: "Menlo", "Monaco", "Consolas", "Courier New", monospace;
+    font-size: 13px;
+    padding: 1px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    line-height: 1.2;
+    color: #333333;
+    word-break: break-all;
+    word-wrap: break-word;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+}
+.rating-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 7px;
+    vertical-align: middle;
+}
+.normal {
+    background-color: #50d4ab;
+}
+.warning {
+    background-color: #ffb700;
+}
+.incident {
+    background-color: #fc5043;
 }
 </style>
