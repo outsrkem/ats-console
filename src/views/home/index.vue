@@ -96,6 +96,8 @@ import Pagination from "@/components/pagination/pagination";
 import { deepClone } from "@/utils/deepClone.js";
 import { formatTime } from "@/utils/date.js";
 import { basicInfo, GetAutLog, GetExtras } from "../../api";
+import { convertToLimitOffset } from "../../utils/common.js";
+
 export default {
     name: "HomeIndex",
     components: {
@@ -179,7 +181,7 @@ export default {
         },
         loadGetAutLog: function (page_size, page) {
             const etime = this.eventQuery.etime;
-            const paging = { page_size: page_size, page: page };
+            const paging = convertToLimitOffset(page, page_size);
             let par1 = {};
             if (etime != null) {
                 par1 = { from: etime[0], to: etime[1] };
