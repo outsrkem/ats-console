@@ -1,5 +1,5 @@
 <template>
-    <div class="el-aside">
+    <el-aside class="aside" style="width: auto">
         <p style="text-align: center">审计日志</p>
         <el-menu :default-active="activePath" unique-opened>
             <el-menu-item index="/" @click="OnSwitchRoutes('/')">
@@ -11,7 +11,7 @@
                 <template #title><span>日志配置</span></template>
             </el-menu-item>
         </el-menu>
-    </div>
+    </el-aside>
 </template>
 
 <script>
@@ -48,8 +48,11 @@ export default {
 </script>
 
 <style scoped lang="less">
-.el-aside {
-    background-color: #ffffff;
+.aside {
+    flex-shrink: 0;
+    .aside-menu {
+        height: 100%;
+    }
     .el-menu {
         border-right: none;
     }

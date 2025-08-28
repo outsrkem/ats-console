@@ -14,6 +14,7 @@
                                 <el-date-picker
                                     size="small"
                                     v-model="eventQuery.etime"
+                                    style="width: 350px"
                                     value-format="x"
                                     type="datetimerange"
                                     :shortcuts="eventQuery.shortcuts"
@@ -25,7 +26,7 @@
                                 <el-input
                                     size="small"
                                     v-model="eventQuery.inputcriteria"
-                                    style="width: 460px"
+                                    style="width: 350px"
                                     clearable
                                     placeholder=""
                                     @clear="onRefresh"
