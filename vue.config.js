@@ -1,29 +1,29 @@
-const { defineConfig } = require('@vue/cli-service')
+const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
     transpileDependencies: true,
-    publicPath: '/ats/',
+    publicPath: "/ats/",
 
     pages: {
-        index: 'src/main.js',
+        index: "src/main.js",
     },
 
     configureWebpack: {
-        name: 'ats'
+        name: "ats",
     },
 
     devServer: {
         proxy: {
-          '/': {
-            target: 'https://uias.localvm.outsrkem.top:30078',
-            changeOrigin: true,
-            secure: false,
-            pathRewrite: {
-              '^/': '/'
-            }
-          }
+            "/": {
+                target: "https://uias.localvm.outsrkem.top:30078",
+                changeOrigin: true,
+                secure: false,
+                pathRewrite: {
+                    "^/": "/",
+                },
+            },
         },
         webSocketServer: false,
     },
 
     productionSourceMap: false,
-})
+});

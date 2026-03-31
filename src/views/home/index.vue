@@ -48,36 +48,23 @@
                 </div>
             </template>
             <div>
-                <el-table :data="elogs" v-loading="loading.autlog">
-                    <el-table-column prop="name" label="事件名称" width="170" show-overflow-tooltip />
-                    <el-table-column prop="service" label="服务" width="100" show-overflow-tooltip />
-                    <el-table-column prop="account" label="操作账号" show-overflow-tooltip />
-                    <el-table-column prop="resource_id" label="资源ID" width="320" show-overflow-tooltip />
-                    <el-table-column prop="rating" label="事件级别" width="100" show-overflow-tooltip>
-                        <template #default="scope">
-                            <span class="rating-dot" :class="scope.row.rating" />
-                            <span>{{ scope.row.rating }}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="message" label="事件消息" show-overflow-tooltip />
-                    <el-table-column label="操作时间" show-overflow-tooltip>
-                        <template #default="scope">{{ formatDate(scope.row.etime) }}</template>
-                    </el-table-column>
-                    <el-table-column label="操作">
-                        <template #default="scope">
-                            <span v-if="scope.row.extras">
-                                <el-button link type="primary" @click="onExtras(scope.row)">查看更多</el-button>
-                            </span>
-                        </template>
-                    </el-table-column>
-                </el-table>
+                <MyTable :data="elogs" :columns="columns" v-loading="loading.autlog">
+                    <template #etime="{ row }">
+                        {{ formatDate(row.etime) }}
+                    </template>
+                    <template #rating="{ row }">
+                        <span class="rating-dot" :class="row.rating" />
+                        <span>{{ row.rating }}</span>
+                    </template>
+                    <template #operation="{ row }">
+                        <span v-if="row.extras">
+                            <el-button link type="primary" @click="onExtras(row)">查看更多</el-button>
+                        </span>
+                    </template>
+                </MyTable>
             </div>
             <div class="pagination">
-                <div>
-                    <!--分页开始-->
-                    <Pagination :pageTotal="pageTotal" :pageSize="pageSize" @CurrentChange="onCurrentChange" @SizeChange="onSizeChange" />
-                    <!--分页结束-->
-                </div>
+                <Pagination :pageTotal="pageTotal" :pageSize="pageSize" @CurrentChange="onCurrentChange" @SizeChange="onSizeChange" />
             </div>
         </el-card>
         <!-- 详情开始 -->
@@ -92,16 +79,18 @@
     </div>
 </template>
 <script>
-import Pagination from "@/components/pagination/pagination";
+import MyTable from "../../components/MyTable/MyTable.vue";
+import Pagination from "@/components/pagination/pagination.vue";
 import { deepClone } from "@/utils/deepClone.js";
 import { formatTime } from "@/utils/date.js";
 import { basicInfo, GetAutLog, GetExtras } from "../../api";
-import { convertToLimitOffset } from "../../utils/common.js";
+import { withDelay, convertToLimitOffset } from "../../utils/common.js";
 
 export default {
     name: "HomeIndex",
     components: {
         Pagination,
+        MyTable,
     },
     props: {},
     data() {
@@ -112,6 +101,16 @@ export default {
             pageTotal: 0,
             pageSize: 15,
             page: 1,
+            columns: [
+                { label: "事件名称", prop: "name" },
+                { label: "服务", prop: "service" },
+                { label: "操作账号", prop: "account" },
+                { label: "资源ID", prop: "resource_id" },
+                { label: "事件级别", slot: "rating" },
+                { label: "事件消息", prop: "message" },
+                { label: "操作时间", slot: "etime" },
+                { label: "操作", slot: "operation" },
+            ],
             eventQuery: {
                 select: "resid", // 默认按资源id查询
                 inputcriteria: null, // 查询条件
@@ -180,6 +179,7 @@ export default {
             this.userInfo = JSON.stringify(res, null, 4);
         },
         loadGetAutLog: function (page_size, page) {
+            this.loading.autlog = true;
             const etime = this.eventQuery.etime;
             const paging = convertToLimitOffset(page, page_size);
             let par1 = {};
@@ -188,7 +188,6 @@ export default {
             }
             let par2 = {};
             if (this.eventQuery.inputcriteria !== null && this.eventQuery.inputcriteria !== "") {
-                // 查询条件不为空时才进行查询条件构造
                 switch (this.eventQuery.select) {
                     case "resid":
                         par2 = { resid: this.eventQuery.inputcriteria };
@@ -200,7 +199,7 @@ export default {
             }
 
             const params = { ...par1, ...par2, ...paging };
-            GetAutLog(params)
+            withDelay(() => GetAutLog(params))
                 .then((res) => {
                     this.elogs = res.payload.items;
                     this.pageTotal = res.payload.page_info.total;
@@ -218,7 +217,7 @@ export default {
             this.openExtras = true;
             this.moreData = deepClone(val);
             const paths = { exid: val.extras };
-            GetExtras(paths)
+            withDelay(() => GetExtras(paths))
                 .then((res) => {
                     this.loading.extras = false;
                     this.moreData.extras = res.payload.extras;
@@ -229,11 +228,7 @@ export default {
             return formatTime(time);
         },
         onRefresh() {
-            this.loading.autlog = true;
-            clearTimeout(this.timeoutId);
-            this.timeoutId = setTimeout(() => {
-                this.loadGetAutLog(this.pageSize, this.page);
-            }, this.$config.delayTime);
+            this.loadGetAutLog(this.pageSize, this.page);
         },
         onCurrentChange(p) {
             this.page = p;
