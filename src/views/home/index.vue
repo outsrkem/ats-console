@@ -99,7 +99,7 @@ export default {
             timeoutId: null,
             elogs: [],
             pageTotal: 0,
-            pageSize: 15,
+            pageSize: 10,
             page: 1,
             columns: [
                 { label: "事件名称", prop: "name" },
@@ -248,54 +248,4 @@ export default {
 };
 </script>
 
-<style scoped lang="less">
-.code-container {
-    position: relative;
-    max-height: 600px;
-    overflow: auto;
-    margin-top: 10px;
-    border: 1px solid #ebeef5;
-    border-radius: 4px;
-    padding: 10px;
-    background-color: #f5f5f5;
-}
-.codepre {
-    box-sizing: border-box;
-    /*以下样式是自动换行代码*/
-    white-space: pre-wrap; /* css-3 */
-    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-    white-space: -pre-wrap; /* Opera 4-6 */
-    white-space: -o-pre-wrap; /* Opera 7 */
-    word-wrap: break-word; /* Internet Explorer 5.5+ */
-    /*以上样式是自动换行代码，需要的加上，不需要的删除*/
-    overflow: auto;
-    font-family: "Menlo", "Monaco", "Consolas", "Courier New", monospace;
-    font-size: 13px;
-    padding: 1px;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    line-height: 1.2;
-    color: #333333;
-    word-break: break-all;
-    word-wrap: break-word;
-    border-radius: 4px;
-    background-color: #f5f5f5;
-}
-.rating-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 7px;
-    vertical-align: middle;
-}
-.normal {
-    background-color: #50d4ab;
-}
-.warning {
-    background-color: #ffb700;
-}
-.incident {
-    background-color: #fc5043;
-}
-</style>
+<style scoped lang="less" src="./index.less"></style>

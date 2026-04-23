@@ -1,14 +1,24 @@
 const { defineConfig } = require("@vue/cli-service");
+
 module.exports = defineConfig({
     transpileDependencies: true,
+    productionSourceMap: false,
     publicPath: "/ats/",
+
+    configureWebpack: {
+        devtool: false,
+        name: "ats",
+    },
 
     pages: {
         index: "src/main.js",
     },
 
-    configureWebpack: {
-        name: "ats",
+    // 拆包优化
+    chainWebpack: (config) => {
+        config.optimization.splitChunks({
+            chunks: "all",
+        });
     },
 
     devServer: {
@@ -24,6 +34,4 @@ module.exports = defineConfig({
         },
         webSocketServer: false,
     },
-
-    productionSourceMap: false,
 });
